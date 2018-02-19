@@ -68,7 +68,7 @@ namespace Gerrit
 
             GerritUtil.StartAgent(owner, Module, _NO_TRANSLATE_Remotes.Text);
 
-            string targetRef = PublishDraft.Checked ? "drafts" : "publish";
+            string targetRef = PublishDraft.Checked ? "drafts" : "for";
 
             var pushCommand = UICommands.CreateRemoteCommand();
 
@@ -77,6 +77,19 @@ namespace Gerrit
 
             if (!string.IsNullOrEmpty(topic))
                 targetBranch += "/" + topic;
+
+            string reviewers = _NO_TRANSLATE_Reviewers.Text.Trim();
+            if (!string.IsNullOrEmpty(reviewers))
+            {
+                List<string> reviewersParam = new List<string>();
+                foreach (string reviewer in reviewers.Split(' '))
+                {
+                    if (!string.IsNullOrEmpty(reviewer))
+                        reviewersParam.Add("r=" + reviewer);
+                }
+
+                targetBranch += "%" + string.Join(",", reviewersParam);
+            }
 
             pushCommand.CommandText = PushCmd(
                 _NO_TRANSLATE_Remotes.Text,
